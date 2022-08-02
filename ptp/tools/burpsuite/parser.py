@@ -40,11 +40,11 @@ class BurpXMLParser(XMLParser):
         except (TypeError, XMLSyntaxError):
             return False
         version = stream.attrib.get('burpVersion', '')
-        if not version:
-            return False
-        if not re.findall(cls.__version__, version, re.IGNORECASE):
-            return False
-        return True
+        return (
+            bool(re.findall(cls.__version__, version, re.IGNORECASE))
+            if version
+            else False
+        )
 
     def parse_metadata(self):
         """Parse the metadata of the report.
@@ -75,10 +75,7 @@ class BurpXMLParser(XMLParser):
         self.data = []
         data = []
         # TODO: maybe a better way to get base64 value
-        if self.stream.find('.//request').attrib['base64'] == 'false':
-            is_base64 = False
-        else:
-            is_base64 = True
+        is_base64 = self.stream.find('.//request').attrib['base64'] != 'false'
         for item in self.stream.findall('.//item'):
             response_status_code = item.find('status').text
             if is_base64:

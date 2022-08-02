@@ -92,7 +92,7 @@ class HoppyParser(FileParser):
         transactions = self._re_transaction.findall(self.stream)
         if not transactions:
             return None
-        for count, transaction in enumerate(transactions):
+        for transaction in transactions:
             response = self._re_response.search(transaction).group().strip() + '\n\n'
             status_code = self._re_response_status_code.findall(response)
             parsed_response = self._re_response_parse.findall(response)

@@ -74,9 +74,7 @@ class W3AFXMLParser(XMLParser):
             return False
         if len(version) >= 1:  # In case we found several version numbers.
             version = version[0]
-        if not re.findall(cls.__version__, version, re.IGNORECASE):
-            return False
-        return True
+        return bool(re.findall(cls.__version__, version, re.IGNORECASE))
 
     def parse_metadata(self):
         """Parse the metadata of the report.
@@ -112,7 +110,7 @@ class W3AFXMLParser(XMLParser):
         """
         data = []
         transactions = self._re_transaction.findall(raw_transactions)
-        for count, transaction in enumerate(transactions):
+        for transaction in transactions:
             response = self._re_response.findall(transaction)[0] + '\n'
             response_header = self._re_reponse_header.search(response).group()
             # Somehow follow naming conventions from http://docs.python-requests.org/en/master/

@@ -41,9 +41,7 @@ class NmapXMLParser(XMLParser):
             return False
         if stream.get('scanner') != cls.__tool__:
             return False
-        if not re.findall(cls.__version__, stream.get('version'), re.IGNORECASE):
-            return False
-        return True
+        return bool(re.findall(cls.__version__, stream.get('version'), re.IGNORECASE))
 
     def parse_metadata(self):
         """Parse the metadatas of the report.
@@ -55,7 +53,7 @@ class NmapXMLParser(XMLParser):
 
         """
         # Find the metadata of Nmap.
-        metadata = {key: value for key, value in self.stream.items()}
+        metadata = dict(self.stream.items())
         if self.check_version(metadata):
             self.metadata = metadata
         else:
@@ -72,6 +70,4 @@ class NmapXMLParser(XMLParser):
             Not implemented yet.
 
         """
-        # TODO: Parse Nmap result
-        ports = self.stream.findall('.//port')
-        return ports
+        return self.stream.findall('.//port')

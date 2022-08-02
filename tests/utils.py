@@ -74,7 +74,13 @@ class MockParserLight(MockParser):
         return {}
 
     def parse_report(self):
-        vulns = []
-        if not self.light:  # More complete parsing
-            vulns = [{'ranking': constants.UNKNOWN, 'transactions': [{'request': '', 'response': ''}]}]
-        return vulns
+        return (
+            []
+            if self.light
+            else [
+                {
+                    'ranking': constants.UNKNOWN,
+                    'transactions': [{'request': '', 'response': ''}],
+                }
+            ]
+        )

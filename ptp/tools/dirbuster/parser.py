@@ -55,9 +55,7 @@ class DirbusterParser(LineParser):
 
         """
         stream = cls.handle_file(pathname, filename, first=first)
-        if stream and re.match(cls._re_version, stream[0]):
-            return True
-        return False
+        return bool(stream and re.match(cls._re_version, stream[0]))
 
     def parse_metadata(self):
         """Parse the metadata of the report.
@@ -68,9 +66,8 @@ class DirbusterParser(LineParser):
         """
         metadata = {}
         if len(self.stream):
-            version = re.match(self._re_version, self.stream[0])
-            if version:
-                metadata['version'] = version.group('version')
+            if version := re.match(self._re_version, self.stream[0]):
+                metadata['version'] = version['version']
         self.metadata = metadata
         return metadata
 
@@ -90,10 +87,10 @@ class DirbusterParser(LineParser):
             match_file_status = re.match(self._re_file_status, line)
             if match_dir_status:
                 type_disco = 'directories'
-                status_code = match_dir_status.group('status')
+                status_code = match_dir_status['status']
             elif match_file_status:
                 type_disco = 'files'
-                status_code = match_file_status.group('status')
+                status_code = match_file_status['status']
             elif line.startswith('/'):  # This line contains a discovery
                 status = int(status_code)
                 # If this is the section of the successful ones (2xx).

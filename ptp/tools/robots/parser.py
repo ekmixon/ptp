@@ -37,9 +37,9 @@ class RobotsParser(LineParser):
 
         """
         stream = cls.handle_file(pathname, filename, first=first)
-        if stream and stream[0].startswith(('User-agent:', 'Disallow:', 'Allow:')):  # FIXME: Weak check here...
-            return True
-        return False
+        return bool(
+            stream and stream[0].startswith(('User-agent:', 'Disallow:', 'Allow:'))
+        )
 
     def parse_metadata(self):
         """Parse the metadata of the report.

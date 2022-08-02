@@ -33,9 +33,7 @@ class OWASPCM008Parser(LineParser):
 
         """
         stream = cls.handle_file(pathname, filename, first=first)
-        if stream and stream[0].startswith('HTTP'):  # FIXME: Weak check here...
-            return True
-        return False
+        return bool(stream and stream[0].startswith('HTTP'))
 
     def parse_metadata(self):
         """Parse the metadata of the report.

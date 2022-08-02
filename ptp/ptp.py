@@ -142,9 +142,14 @@ class PTP(object):
             (See :mod:`ptp.libptp.constants`).
 
         """
-        if not self.vulns:
-            return UNKNOWN
-        return max(RANKING_SCALE.get(vuln.get('ranking'), UNKNOWN) for vuln in self.vulns)
+        return (
+            max(
+                RANKING_SCALE.get(vuln.get('ranking'), UNKNOWN)
+                for vuln in self.vulns
+            )
+            if self.vulns
+            else UNKNOWN
+        )
 
     @property
     def parser(self):

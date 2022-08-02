@@ -43,9 +43,7 @@ class MetasploitParser(FileParser):
 
         """
         # TODO: Properly check the supported versions.
-        if plugin:
-            return True
-        return False
+        return bool(plugin)
 
     def parse_metadata(self):
         """Parse the metadata of the report.

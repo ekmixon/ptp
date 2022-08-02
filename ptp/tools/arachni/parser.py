@@ -58,9 +58,7 @@ class ArachniXMLParser(XMLParser):
         version = stream.find('.//version')
         if version is None:
             return False
-        if not re.findall(cls.__version__, version.text, re.IGNORECASE):
-            return False
-        return True
+        return bool(re.findall(cls.__version__, version.text, re.IGNORECASE))
 
     def parse_metadata(self):
         """Parse the metadata of the report.
@@ -119,9 +117,13 @@ class ArachniXMLParser(XMLParser):
             {'ranking': self.RANKING_SCALE[vuln.find('.//severity').text.lower()]}
             for vuln in self.stream.find('.//issues')]
         if not self.light:
-            temp = []
-            for record in self.stream.xpath('//variations//variation//referring_page'):
-                temp.append(record.getchildren())
+            temp = [
+                record.getchildren()
+                for record in self.stream.xpath(
+                    '//variations//variation//referring_page'
+                )
+            ]
+
             self.vulns.append({'ranking': constants.UNKNOWN, 'transactions': self._parse_report_full(temp)})
         return self.vulns
 
@@ -165,9 +167,7 @@ class ArachniJSONParser(JSONParser):
             version = stream['version']
         else:
             return False
-        if not re.findall(cls.__version__, version, re.IGNORECASE):
-            return False
-        return True
+        return bool(re.findall(cls.__version__, version, re.IGNORECASE))
 
     def parse_metadata(self):
         """Parse the metadata of the report.

@@ -192,18 +192,13 @@ class SkipfishJSParser(AbstractParser):
         split_data = self.report_stream.split(";")
         js_data = [data for data in split_data if data is not None]
         py_data = []
-        format_data = {}  # Final python dict after converting js to py
-        dirs = []  # List of directories of all urls
         # Converting js to py to make it simple to process
         for data in js_data:
             temp_data = js2py.eval_js(data)
             if temp_data is not None:
                 py_data.append(temp_data)
 
-        # Mapping variable to its content
-        for i in range(len(py_data)):
-            format_data[variables[i]] = py_data[i]
-
+        format_data = {variables[i]: py_data[i] for i in range(len(py_data))}
         if REPORT_VAR_NAME not in variables:
             raise ReportNotFoundError('PTP did NOT find issue_samples variable. Is this the correct file?')
         # We now have a raw version of the Skipfish report as a list of dict.
@@ -211,9 +206,18 @@ class SkipfishJSParser(AbstractParser):
             {'ranking': self.RANKING_SCALE[vuln['severity']]}
             for vuln in format_data[REPORT_VAR_NAME]]
         if not self.light:
+            dirs = []  # List of directories of all urls
             for var in variables:
                 for item in format_data[var]:
-                    for sample in item['samples']:
-                        dirs.append({'url': sample['url'], 'dir': os.path.join(self.search_directory, sample['dir'])})
+                    dirs.extend(
+                        {
+                            'url': sample['url'],
+                            'dir': os.path.join(
+                                self.search_directory, sample['dir']
+                            ),
+                        }
+                        for sample in item['samples']
+                    )
+
             self.vulns.append({'ranking': constants.UNKNOWN, 'transactions': self._parse_report_full(dirs)})
         return self.vulns

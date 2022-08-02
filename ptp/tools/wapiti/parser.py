@@ -49,9 +49,7 @@ class WapitiXMLParser(XMLParser):
         metadata = {el.get('name'): el.text for el in raw_metadata}
         if metadata.get('generatorName', '').lower() != cls.__tool__:
             return False
-        if not re.match(cls.__version__, metadata.get('generatorVersion', '')):
-            return False
-        return True
+        return bool(re.match(cls.__version__, metadata.get('generatorVersion', '')))
 
     def parse_metadata(self):
         """Parse the metadata of the report.
@@ -86,8 +84,6 @@ class WapitiXMLParser(XMLParser):
         vulns = []
         for category in section_vuln.findall('.//vulnerability'):
             entries = category.find('.//entries')
-            if not len(entries):
-                pass
             # Ensure that there are 'entry' sub-sections that represent the
             # actual discoveries/vulnerabilities.
             if len(entries.findall('.//entry')) and category.get('name') in SIGNATURES:
@@ -130,9 +126,7 @@ class Wapiti221XMLParser(XMLParser):
         if raw_metadata is None:
             return False
         metadata = raw_metadata.get('id')
-        if not re.findall(cls.__version__, metadata, re.IGNORECASE):
-            return False
-        return True
+        return bool(re.findall(cls.__version__, metadata, re.IGNORECASE))
 
     def parse_metadata(self):
         """Parse the metadata of the report.
@@ -145,9 +139,7 @@ class Wapiti221XMLParser(XMLParser):
         """
         # Find the metadata of Wapiti.
         raw_metadata = self.stream.find('.//generatedBy').get('id')
-        metadata = {}
-        # Only keep the version number
-        metadata['version'] = raw_metadata
+        metadata = {'version': raw_metadata}
         if not self.check_version(metadata):
             raise NotSupportedVersionError('PTP does NOT support this version of Wapiti.')
         self.metadata = metadata
@@ -164,8 +156,6 @@ class Wapiti221XMLParser(XMLParser):
         vulns = []
         for category in section_vuln.findall('.//bugType'):
             entries = category.find('.//bugList')
-            if not len(entries):
-                pass
             # Ensure that there are 'entry' sub-sections that represent the actual discoveries/vulnerabilities.
             if len(entries.findall('.//bug')) and category.get('name') in SIGNATURES:
                 vulns.append({
